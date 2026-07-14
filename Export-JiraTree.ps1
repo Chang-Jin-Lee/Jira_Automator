@@ -23,18 +23,19 @@
 
 .PARAMETER ApiToken
     Atlassian API token (create one at https://id.atlassian.com/manage-profile/security/api-tokens).
-    If omitted, the token is read from the JIRA_API_TOKEN environment variable, and
-    if that is also unset, you are prompted for it interactively (input is masked).
+    If omitted, the token is read from the JIRA_API_TOKEN environment variable (which can
+    come from a .env file next to this script — see .env.example), and if that is also
+    unset, you are prompted for it interactively (input is masked).
 
 .EXAMPLE
     .\Export-JiraTree.ps1 -Site "https://your-domain.atlassian.net" -Email "you@example.com" -RootIssue "KAN-182"
 
 .EXAMPLE
-    $env:JIRA_API_TOKEN = "your-token"
-    .\Export-JiraTree.ps1 -Email "you@example.com" -RootIssue "KAN-182"
+    # Copy .env.example to .env, fill in JIRA_SITE/JIRA_EMAIL/JIRA_API_TOKEN/JIRA_ROOT_ISSUE, then:
+    .\Export-JiraTree.ps1
 #>
 param(
-    [string]$Site = "https://your-domain.atlassian.net",
+    [string]$Site = "",
     [string]$Email = "",
     [string]$RootIssue = "",
     [string]$OutputDirectory = ".\jira-export",
@@ -42,17 +43,59 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$Site = $Site.TrimEnd("/")
 
+function Import-DotEnv {
+    param([string]$Path)
+
+    if (-not (Test-Path -LiteralPath $Path)) {
+        return
+    }
+
+    foreach ($line in Get-Content -LiteralPath $Path) {
+        $trimmed = $line.Trim()
+        if ($trimmed -eq "" -or $trimmed.StartsWith("#")) {
+            continue
+        }
+
+        $separatorIndex = $trimmed.IndexOf("=")
+        if ($separatorIndex -lt 1) {
+            continue
+        }
+
+        $name = $trimmed.Substring(0, $separatorIndex).Trim()
+        $value = $trimmed.Substring($separatorIndex + 1).Trim()
+        if (($value.StartsWith('"') -and $value.EndsWith('"')) -or
+            ($value.StartsWith("'") -and $value.EndsWith("'"))) {
+            $value = $value.Substring(1, $value.Length - 2)
+        }
+
+        if ([string]::IsNullOrWhiteSpace((Get-Item -Path "env:$name" -ErrorAction SilentlyContinue).Value)) {
+            Set-Item -Path "env:$name" -Value $value
+        }
+    }
+}
+
+Import-DotEnv (Join-Path $PSScriptRoot ".env")
+
+if ([string]::IsNullOrWhiteSpace($RootIssue)) {
+    $RootIssue = $env:JIRA_ROOT_ISSUE
+}
 if ([string]::IsNullOrWhiteSpace($RootIssue)) {
     $RootIssue = Read-Host "Root issue key (e.g. KAN-182)"
 }
 $RootIssue = $RootIssue.Trim().ToUpperInvariant()
 
-if ($Site -eq "https://your-domain.atlassian.net" -or [string]::IsNullOrWhiteSpace($Site)) {
-    $Site = (Read-Host "Jira site URL (e.g. https://your-domain.atlassian.net)").TrimEnd("/")
+if ([string]::IsNullOrWhiteSpace($Site)) {
+    $Site = $env:JIRA_SITE
 }
+if ([string]::IsNullOrWhiteSpace($Site)) {
+    $Site = Read-Host "Jira site URL (e.g. https://your-domain.atlassian.net)"
+}
+$Site = $Site.TrimEnd("/")
 
+if ([string]::IsNullOrWhiteSpace($Email)) {
+    $Email = $env:JIRA_EMAIL
+}
 if ([string]::IsNullOrWhiteSpace($Email)) {
     $Email = Read-Host "Atlassian account email"
 }

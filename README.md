@@ -20,27 +20,50 @@ for a real export of a task tree with several subtasks.
 
 Authentication uses your Atlassian **email + API token**, never your account password.
 
-### 2. Run the script
+### 2. Set up `.env` (recommended — no more typing the token every run)
 
 ```powershell
 git clone <this-repo-url>
 cd Jira_Automator
-
-.\Export-JiraTree.ps1 `
-    -Site "https://your-domain.atlassian.net" `
-    -Email "you@example.com" `
-    -RootIssue "KAN-182"
+copy .env.example .env
+notepad .env
 ```
 
-You'll be prompted for the API token (input is masked). Any parameter you omit
-(`-Site`, `-Email`, `-RootIssue`) will be prompted for interactively too, so
-you can also just run `.\Export-JiraTree.ps1` with no arguments.
+Fill in your values:
 
-To skip the interactive token prompt (e.g. for repeated runs), set an
-environment variable instead:
+```dotenv
+JIRA_SITE=https://your-domain.atlassian.net
+JIRA_EMAIL=you@example.com
+JIRA_API_TOKEN=your-api-token
+JIRA_ROOT_ISSUE=KAN-182
+```
+
+`.env` is git-ignored (see `.gitignore`), so your token never gets committed.
+Once it's filled in, both the script and the batch file below need no
+arguments at all — every value is read from `.env`.
+
+### 3. Run it
+
+**Double-click `Export-JiraTree.bat`** — it runs the script with whatever is
+in `.env` and pauses at the end so the window doesn't close before you can
+read the result. To export a different issue without editing `.env`, pass it
+as an argument (drag-and-drop-friendly, or from a terminal):
 
 ```powershell
-$env:JIRA_API_TOKEN = "your-token"
+Export-JiraTree.bat KAN-183
+```
+
+Or run the PowerShell script directly:
+
+```powershell
+.\Export-JiraTree.ps1
+```
+
+Any value not found in `.env` and not passed as a parameter (`-Site`,
+`-Email`, `-RootIssue`, `-ApiToken`) is prompted for interactively instead
+(the token prompt masks input), so the script also works with no setup at all:
+
+```powershell
 .\Export-JiraTree.ps1 -Site "https://your-domain.atlassian.net" -Email "you@example.com" -RootIssue "KAN-182"
 ```
 
@@ -84,11 +107,11 @@ your own Jira data — commit exports intentionally if you want to keep one
   in the Jira UI. A 401 means bad email/token; a 404 (or permission error)
   means you can't view that issue.
 - Requests are automatically retried with backoff if Jira rate-limits (HTTP 429).
+- Precedence for each value is: command-line parameter → `.env` → interactive prompt.
+  So `.env` sets your everyday defaults, and a parameter (or a bat file argument)
+  overrides it for one-off runs — e.g. exporting a different issue or site:
 
-## Exporting a different issue or site
-
-```powershell
-.\Export-JiraTree.ps1 -Email "you@example.com" -RootIssue "KAN-183"
-
-.\Export-JiraTree.ps1 -Site "https://another-domain.atlassian.net" -Email "you@example.com" -RootIssue "ABC-100"
-```
+  ```powershell
+  .\Export-JiraTree.ps1 -RootIssue "KAN-183"
+  .\Export-JiraTree.ps1 -Site "https://another-domain.atlassian.net" -Email "you@example.com" -RootIssue "ABC-100"
+  ```
