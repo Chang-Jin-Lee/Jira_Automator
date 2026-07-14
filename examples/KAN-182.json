@@ -1,0 +1,67 @@
+{
+  "key": "KAN-182",
+  "title": "플레이어 캐릭터 개선하기",
+  "description": "",
+  "issueType": "작업",
+  "status": "해야 할 일",
+  "assignee": "이창진",
+  "priority": "High",
+  "url": "https://metropia1.atlassian.net/browse/KAN-182",
+  "children": [
+    {
+      "key": "KAN-183",
+      "title": "캐릭터 구르기 개선",
+      "description": "구를 때 마우스 방향을 향해 구르되, 구르는 와중에는 방향이 바뀌지 않도록 개선,(fsm, 문서 참고)",
+      "issueType": "Subtask",
+      "status": "검토 중",
+      "assignee": "이창진",
+      "priority": "Medium",
+      "url": "https://metropia1.atlassian.net/browse/KAN-183",
+      "children": []
+    },
+    {
+      "key": "KAN-184",
+      "title": "조준 시 회전 속도 감소 ",
+      "description": "플레이어가 조준하고 있는 동안, 플레이어의 회전 속도가 감소하도록 변경",
+      "issueType": "Subtask",
+      "status": "해야 할 일",
+      "assignee": "Unassigned",
+      "priority": "Medium",
+      "url": "https://metropia1.atlassian.net/browse/KAN-184",
+      "children": []
+    },
+    {
+      "key": "KAN-189",
+      "title": "캐릭터가 조준했을 때 걷기 개선하기 ",
+      "description": "캐릭터 조준을 기준으로 할 때 옆으로 걷는 자세를 추가하여 현재의 어색한 조준 자세를 수정.",
+      "issueType": "Subtask",
+      "status": "해야 할 일",
+      "assignee": "Unassigned",
+      "priority": "Medium",
+      "url": "https://metropia1.atlassian.net/browse/KAN-189",
+      "children": []
+    },
+    {
+      "key": "KAN-190",
+      "title": "스태미나 생성",
+      "description": "플레이어가 달리기/ 구르기 사용시 스태미나를 소모. \n스태미나 최대치: 200 \n구르기: 50 소모 \n달리기: 초당 10 소모",
+      "issueType": "Subtask",
+      "status": "해야 할 일",
+      "assignee": "Unassigned",
+      "priority": "Medium",
+      "url": "https://metropia1.atlassian.net/browse/KAN-190",
+      "children": []
+    },
+    {
+      "key": "KAN-191",
+      "title": "걷기 만들기",
+      "description": "걷기/달리기를 분류하여 게임 플레이에 있어서 긴장감을 높일 것. 스태미나랑 이 시스템을 결합도 하기.",
+      "issueType": "Subtask",
+      "status": "검토 중",
+      "assignee": "Unassigned",
+      "priority": "Medium",
+      "url": "https://metropia1.atlassian.net/browse/KAN-191",
+      "children": []
+    }
+  ]
+}
