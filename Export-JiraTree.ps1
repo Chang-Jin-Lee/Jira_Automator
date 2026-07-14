@@ -16,7 +16,8 @@
     Atlassian account email used for API authentication. Prompted for if omitted.
 
 .PARAMETER RootIssue
-    The issue key to start exporting from, e.g. KAN-182.
+    The issue key to start exporting from, e.g. KAN-182. Always prompted for if
+    omitted (deliberately not read from .env — this is expected to change often).
 
 .PARAMETER OutputDirectory
     Directory to write <RootIssue>.md / .html / .json into. Defaults to .\jira-export
@@ -31,8 +32,9 @@
     .\Export-JiraTree.ps1 -Site "https://your-domain.atlassian.net" -Email "you@example.com" -RootIssue "KAN-182"
 
 .EXAMPLE
-    # Copy .env.example to .env, fill in JIRA_SITE/JIRA_EMAIL/JIRA_API_TOKEN/JIRA_ROOT_ISSUE, then:
+    # Copy .env.example to .env, fill in JIRA_SITE/JIRA_EMAIL/JIRA_API_TOKEN, then:
     .\Export-JiraTree.ps1
+    # (you'll still be prompted for the root issue key each run)
 #>
 param(
     [string]$Site = "",
@@ -77,9 +79,6 @@ function Import-DotEnv {
 
 Import-DotEnv (Join-Path $PSScriptRoot ".env")
 
-if ([string]::IsNullOrWhiteSpace($RootIssue)) {
-    $RootIssue = $env:JIRA_ROOT_ISSUE
-}
 if ([string]::IsNullOrWhiteSpace($RootIssue)) {
     $RootIssue = Read-Host "Root issue key (e.g. KAN-182)"
 }

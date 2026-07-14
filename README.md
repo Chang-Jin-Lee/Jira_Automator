@@ -35,19 +35,19 @@ Fill in your values:
 JIRA_SITE=https://your-domain.atlassian.net
 JIRA_EMAIL=you@example.com
 JIRA_API_TOKEN=your-api-token
-JIRA_ROOT_ISSUE=KAN-182
 ```
 
 `.env` is git-ignored (see `.gitignore`), so your token never gets committed.
-Once it's filled in, both the script and the batch file below need no
-arguments at all — every value is read from `.env`.
+There's deliberately no root issue key in `.env` — that's the one thing you
+change on every run, so the script always asks for it instead of silently
+reusing an old value.
 
 ### 3. Run it
 
-**Double-click `Export-JiraTree.bat`** — it runs the script with whatever is
-in `.env` and pauses at the end so the window doesn't close before you can
-read the result. To export a different issue without editing `.env`, pass it
-as an argument (drag-and-drop-friendly, or from a terminal):
+**Double-click `Export-JiraTree.bat`** — it runs the script using `.env` for
+site/email/token, then prompts you for the root issue key, and pauses at the
+end so the window doesn't close before you can read the result. To skip the
+prompt, pass the key as an argument (from a terminal):
 
 ```powershell
 Export-JiraTree.bat KAN-183
@@ -59,9 +59,10 @@ Or run the PowerShell script directly:
 .\Export-JiraTree.ps1
 ```
 
-Any value not found in `.env` and not passed as a parameter (`-Site`,
-`-Email`, `-RootIssue`, `-ApiToken`) is prompted for interactively instead
-(the token prompt masks input), so the script also works with no setup at all:
+`-RootIssue` is always prompted for unless passed as a parameter or bat file
+argument. `-Site`/`-Email`/`-ApiToken` fall back to `.env`, and if still
+missing, are prompted for too (the token prompt masks input) — so the script
+also works with no `.env` set up at all:
 
 ```powershell
 .\Export-JiraTree.ps1 -Site "https://your-domain.atlassian.net" -Email "you@example.com" -RootIssue "KAN-182"
@@ -107,9 +108,9 @@ your own Jira data — commit exports intentionally if you want to keep one
   in the Jira UI. A 401 means bad email/token; a 404 (or permission error)
   means you can't view that issue.
 - Requests are automatically retried with backoff if Jira rate-limits (HTTP 429).
-- Precedence for each value is: command-line parameter → `.env` → interactive prompt.
-  So `.env` sets your everyday defaults, and a parameter (or a bat file argument)
-  overrides it for one-off runs — e.g. exporting a different issue or site:
+- Precedence for `-Site`/`-Email`/`-ApiToken` is: command-line parameter →
+  `.env` → interactive prompt. `-RootIssue` skips the `.env` step and always
+  prompts unless passed directly — e.g. exporting a different issue or site:
 
   ```powershell
   .\Export-JiraTree.ps1 -RootIssue "KAN-183"
