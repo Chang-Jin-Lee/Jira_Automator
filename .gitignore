@@ -1,0 +1,2 @@
+# Default export output directory (contains your own Jira data — not meant to be committed)
+/jira-export/
