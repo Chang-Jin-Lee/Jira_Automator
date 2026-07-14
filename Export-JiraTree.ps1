@@ -84,13 +84,21 @@ if ([string]::IsNullOrWhiteSpace($RootIssue)) {
 }
 $RootIssue = $RootIssue.Trim().ToUpperInvariant()
 
+$placeholderSite = "https://your-domain.atlassian.net"
+
 if ([string]::IsNullOrWhiteSpace($Site)) {
     $Site = $env:JIRA_SITE
 }
-if ([string]::IsNullOrWhiteSpace($Site)) {
+if ([string]::IsNullOrWhiteSpace($Site) -or $Site.TrimEnd("/") -eq $placeholderSite) {
+    if ($Site.TrimEnd("/") -eq $placeholderSite) {
+        Write-Host "JIRA_SITE in .env is still the placeholder value ($placeholderSite) - it needs to be your real Jira site."
+    }
     $Site = Read-Host "Jira site URL (e.g. https://your-domain.atlassian.net)"
 }
 $Site = $Site.TrimEnd("/")
+if ($Site -eq $placeholderSite) {
+    throw "JIRA_SITE is still set to the placeholder value ($placeholderSite). Edit .env (or pass -Site) with your actual Jira Cloud domain, e.g. https://your-company.atlassian.net."
+}
 
 if ([string]::IsNullOrWhiteSpace($Email)) {
     $Email = $env:JIRA_EMAIL
