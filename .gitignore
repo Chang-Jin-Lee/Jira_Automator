@@ -1,2 +1,5 @@
 # Default export output directory (contains your own Jira data — not meant to be committed)
 /jira-export/
+
+# Holds your real Atlassian email/token — never commit this, use .env.example as the template
+/.env
